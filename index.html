@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오버워치 러너리그 시즌 5 모의 스네이크 드래프트</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800;900&family=Noto+Sans+KR:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas for Screenshot Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans KR"', 'sans-serif'],
+            chakra: ['"Chakra Petch"', 'sans-serif'],
+          },
+          colors: {
+            tank: '#3b82f6',
+            dps: '#ef4444',
+            sup: '#10b981',
+          },
+          boxShadow: {
+            'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.45)',
+            'neon-blue': '0 0 25px rgba(59, 130, 246, 0.4)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #060913;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.16) 0%, transparent 60%),
+        radial-gradient(circle at 10% 35%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 65%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+        linear-gradient(to bottom, #060913, #090e1c);
+      min-height: 100vh;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+    
+    .tech-border {
+      position: relative;
+    }
+    .tech-border::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 8px; height: 8px;
+      border-top: 2px solid #22d3ee;
+      border-left: 2px solid #22d3ee;
+    }
+    .tech-border::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0; width: 8px; height: 8px;
+      border-bottom: 2px solid #22d3ee;
+      border-right: 2px solid #22d3ee;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080d1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #06b6d4;
+    }
+    
+    @keyframes pulse-ring {
+      0%, 100% { border-color: rgba(34, 211, 238, 0.9); box-shadow: 0 0 16px rgba(6, 182, 212, 0.5); }
+      50% { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 0 6px rgba(59, 130, 246, 0.2); }
+    }
+    .turn-active {
+      animation: pulse-ring 2.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-cyan-500 selection:text-black">
+
+<div class="max-w-[1720px] mx-auto px-3 sm:px-6 py-4 flex flex-col min-h-screen">
+
+  <!-- Header Banner -->
+  <header class="relative border-b border-cyan-500/30 pb-4 mb-5 pt-1 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center shadow-neon-cyan border border-cyan-300">
+        <i class="fa-solid fa-gamepad text-2xl text-slate-950"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs uppercase tracking-widest px-2 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-400 font-chakra font-bold">RUNNER LEAGUE</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-blue-950 border border-blue-500/40 text-blue-300 font-semibold font-chakra">OVERWATCH 2026 S5</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/40 text-emerald-300 font-semibold">4R SNAKE DRAFT</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-chakra flex items-center gap-2 mt-0.5">
+          러너리그 시즌 5 <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400">모의 스네이크 드래프트</span>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Quick Action Controls -->
+    <div class="flex items-center flex-wrap gap-2">
+      <button id="sfx-toggle-btn" class="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-volume-high text-cyan-400" id="sfx-icon"></i>
+        <span>효과음 ON</span>
+      </button>
+
+      <button id="order-modal-btn" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-sliders text-amber-400"></i>
+        <span>팀장 순번 재설정</span>
+      </button>
+
+      <button id="undo-btn" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none">
+        <i class="fa-solid fa-rotate-left text-sky-400"></i>
+        <span>직전 픽 취소</span>
+      </button>
+
+      <button id="auto-pick-btn" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white transition flex items-center gap-1.5 shadow-md">
+        <i class="fa-solid fa-bolt text-yellow-300"></i>
+        <span>AI 자동 지명</span>
+      </button>
+
+      <button id="result-view-btn" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-600 text-emerald-300 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-camera"></i>
+        <span>결과 캡쳐 / 공유</span>
+      </button>
+
+      <button id="reset-draft-btn" class="px-3 py-2 rounded-lg text-xs font-semibold bg-rose-950/60 hover:bg-rose-900 border border-rose-700 text-rose-300 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-trash-can"></i>
+        <span>초기화</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Phase 1: Host Captain Seeding Setup -->
+  <section id="setup-view" class="w-full max-w-4xl mx-auto my-auto py-8 px-6 sm:px-10 bg-slate-900/95 border border-cyan-500/40 rounded-2xl backdrop-blur-xl shadow-2xl tech-border">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40 mb-2">
+        <i class="fa-solid fa-crown text-amber-400"></i> 진행자 순번 셋업 단계
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-white font-chakra">탱커 팀장 5인 드래프트 순번 지정</h2>
+      <p class="text-slate-400 text-xs sm:text-sm mt-1.5">
+        1번부터 5번까지 시드를 정하세요. 스네이크 방식에 따라 <strong>1-2-3-4-5 ⇄ 5-4-3-2-1</strong> (총 4라운드, 20픽)으로 진행됩니다.
+      </p>
+      <div class="mt-2 text-[11px] text-cyan-400/90 bg-cyan-950/60 inline-block px-3 py-1 rounded-lg border border-cyan-800">
+        * 코치는 마지막 럭키 드로우로 배정되므로 드래프트에서 제외됩니다 (딜러 2인 + 힐러 2인 지명)
+      </div>
+    </div>
+
+    <!-- 5 Captain Seed Slots -->
+    <div class="space-y-3 mb-6" id="setup-slot-list">
+      <!-- Generated via JavaScript -->
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800">
+      <button id="setup-random-btn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-dice text-amber-400 text-base"></i>
+        <span>팀장 5인 무작위 랜덤 셔플</span>
+      </button>
+      <button id="setup-start-draft-btn" class="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-black bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 transition flex items-center justify-center gap-2 shadow-neon-cyan">
+        <i class="fa-solid fa-play"></i>
+        <span>이 순번으로 모의 드래프트 시작</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Phase 2: Live Draft Workspace -->
+  <div id="draft-workspace" class="hidden flex-col gap-5">
+
+    <!-- Pick Track Hero Banner -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- Current Pick Display -->
+      <div class="lg:col-span-8 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 sm:p-5 relative overflow-hidden backdrop-blur-md shadow-xl tech-border">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+              드래프트 진행 중
+            </span>
+            <span id="draft-round-badge" class="px-3 py-1 rounded-full text-xs font-chakra font-bold bg-slate-800 text-slate-300 border border-slate-700">
+              ROUND 1 / 4
+            </span>
+            <span id="draft-step-badge" class="px-3 py-1 rounded-full text-xs font-chakra font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+              PICK 1 / 20
+            </span>
+          </div>
+
+          <div class="text-xs text-slate-400 flex items-center gap-2">
+            <span>스네이크 규칙:</span>
+            <span class="text-cyan-400 font-semibold font-chakra">1-2-3-4-5 ⇄ 5-4-3-2-1</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <!-- Active Team Spotlight -->
+          <div class="flex items-center gap-4 bg-slate-950/70 p-3.5 rounded-xl border border-cyan-500/30">
+            <div id="hero-team-avatar" class="w-16 h-16 rounded-xl bg-blue-600/30 border-2 border-cyan-400 flex items-center justify-center text-2xl font-black text-cyan-300 font-chakra shadow-neon-cyan">
+              1픽
+            </div>
+            <div>
+              <div class="text-xs text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-bullhorn text-[11px]"></i> 현재 지명 차례 (CURRENT PICK)
+              </div>
+              <h2 id="hero-team-name" class="text-xl sm:text-2xl font-bold text-white tracking-tight">둥그레 팀</h2>
+              <div id="hero-team-needs" class="text-xs text-slate-300 mt-1 flex flex-wrap gap-1.5"></div>
+            </div>
+          </div>
+
+          <!-- Snake Sequence Preview (Next Picks) -->
+          <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span><i class="fa-solid fa-forward-step mr-1 text-sky-400"></i> 이후 지명 순서</span>
+              <span class="text-slate-500 font-chakra text-[10px]">Snake Sequence</span>
+            </div>
+            <div id="snake-preview-track" class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Rule Widget -->
+      <div class="lg:col-span-4 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between backdrop-blur-md">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check text-cyan-400"></i> 팀 구성 규정 (5인 엔트리)
+            </span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">총 20픽</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 text-center text-xs my-2.5">
+            <div class="bg-blue-950/60 border border-blue-600/40 p-2 rounded-lg">
+              <span class="text-blue-400 font-bold block text-[11px]">탱커(팀장)</span>
+              <span class="text-white font-chakra font-bold text-sm">1명 고정</span>
+            </div>
+            <div class="bg-red-950/60 border border-red-600/40 p-2 rounded-lg">
+              <span class="text-red-400 font-bold block text-[11px]">딜러(DPS)</span>
+              <span class="text-white font-chakra font-bold text-sm">2명 선발</span>
+            </div>
+            <div class="bg-emerald-950/60 border border-emerald-600/40 p-2 rounded-lg">
+              <span class="text-emerald-400 font-bold block text-[11px]">힐러(SUP)</span>
+              <span class="text-white font-chakra font-bold text-sm">2명 선발</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            * 딜러 2명 혹은 힐러 2명을 먼저 모두 지명한 팀은 해당 포지션 선택이 자동으로 비활성화됩니다.
+          </p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+          <span class="text-slate-400">남은 선수 풀:</span>
+          <span id="remaining-pool-count" class="font-bold text-cyan-400 font-chakra text-sm">20 / 20명</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+      
+      <!-- LEFT: 5 Teams Roster (xl:col-span-6) -->
+      <section class="xl:col-span-6 flex flex-col gap-3.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-users text-cyan-400"></i> 팀별 라인업 현황
+            <span class="text-xs font-normal text-slate-400 font-chakra">(5 TEAMS)</span>
+          </h3>
+          <span class="text-xs text-slate-400">팀당 5인 (탱커 1 + 딜러 2 + 힐러 2)</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3" id="teams-container">
+          <!-- Rendered by JavaScript: 5 Team Cards -->
+        </div>
+      </section>
+
+      <!-- RIGHT: Available Draft Pool (xl:col-span-6) -->
+      <section class="xl:col-span-6 flex flex-col gap-4">
+        <div class="bg-slate-900/85 border border-slate-800 rounded-2xl p-4 sm:p-5 backdrop-blur-md">
+          
+          <!-- Filter and Search Header -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-address-book text-cyan-400"></i> 지명 대상 선수 풀 (20인)
+              </h3>
+              <p class="text-xs text-slate-400">카드를 클릭하여 현재 지명 팀에 영입하세요.</p>
+            </div>
+
+            <div class="relative w-full sm:w-48">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+              <input type="text" id="player-search" placeholder="선수명 검색..." class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400" />
+            </div>
+          </div>
+
+          <!-- Role Filter Tabs -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800 text-xs">
+            <button class="role-tab px-3.5 py-1.5 rounded-lg font-bold bg-cyan-500 text-slate-950 transition active" data-role="ALL">
+              전체 (<span id="count-all">20</span>)
+            </button>
+            <button class="role-tab px-3.5 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition" data-role="DPS">
+              <span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1"></span> 딜러 DPS (<span id="count-dps">10</span>)
+            </button>
+            <button class="role-tab px-3.5 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition" data-role="SUP">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> 힐러 SUP (<span id="count-sup">10</span>)
+            </button>
+          </div>
+
+          <!-- Player Card Grid (20 players) -->
+          <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 mt-4 max-h-[580px] overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+
+        </div>
+
+        <!-- Pick History -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> 실시간 지명 로그
+            </span>
+            <span id="history-count" class="text-[11px] text-slate-500 font-chakra">0 / 20 PICKS</span>
+          </div>
+          <div id="draft-history-list" class="flex flex-col gap-1.5 max-h-36 overflow-y-auto text-xs text-slate-300">
+            <div class="text-slate-500 italic py-2 text-center text-[11px]">아직 지명 기록이 없습니다.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-8 pt-4 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+    <div>
+      <span>오버워치 러너리그 2026 SEASON 5 • 모의 스네이크 드래프트</span>
+    </div>
+    <div class="flex items-center gap-3 text-slate-400">
+      <span>NEXON</span>
+      <span>•</span>
+      <span>CHZZK (치지직)</span>
+      <span>•</span>
+      <span>OVERWATCH</span>
+      <span>•</span>
+      <span>ENCHANT</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Result Modal with Capture Card -->
+<div id="capture-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+  <div class="bg-slate-900 border border-cyan-500/50 rounded-2xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative my-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <div>
+        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2 font-chakra">
+          <i class="fa-solid fa-trophy text-amber-400"></i> 드래프트 최종 결과 전광판
+        </h3>
+        <p class="text-xs text-slate-400 mt-0.5">완성된 팀 로스터 카드를 이미지로 저장하거나 클립보드에 복사할 수 있습니다.</p>
+      </div>
+      <button id="close-capture-modal" class="text-slate-400 hover:text-white p-1">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <!-- The Exact Card Container to Capture -->
+    <div id="capture-target-card" class="p-4 sm:p-6 rounded-2xl bg-[#080d1a] border border-cyan-500/40 text-slate-100 shadow-2xl">
+      <!-- Card Header -->
+      <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-chakra font-black text-slate-950 text-xl shadow-md">
+            RL
+          </div>
+          <div>
+            <div class="text-[10px] uppercase tracking-widest text-cyan-400 font-chakra font-bold">OVERWATCH RUNNER LEAGUE SEASON 5</div>
+            <div class="text-base sm:text-lg font-black text-white font-chakra">모의 스네이크 드래프트 최종 팀 구성표</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 font-chakra border border-blue-800">5 TEAMS COMPLETE</span>
+          <div class="text-[10px] text-slate-400 mt-0.5" id="capture-card-date"></div>
+        </div>
+      </div>
+
+      <!-- 5 Teams Grid Display for Clean Capture -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3" id="capture-teams-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+        <span>러너리그 S5 • 1-2-3-4-5 스네이크 드래프트 (20 PICKS)</span>
+        <span class="font-mono text-cyan-400">OVERWATCH × ENCHANT</span>
+      </div>
+    </div>
+
+    <!-- Export Action Buttons -->
+    <div class="flex flex-wrap items-center justify-end gap-2.5 mt-5">
+      <button id="btn-copy-text-summary" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-file-lines text-sky-400"></i>
+        <span>텍스트 요약 복사</span>
+      </button>
+
+      <button id="btn-copy-image" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 text-cyan-300 transition flex items-center gap-1.5 shadow-md">
+        <i class="fa-solid fa-copy text-cyan-400"></i>
+        <span id="btn-copy-image-text">이미지 클립보드 복사</span>
+      </button>
+
+      <button id="btn-download-image" class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 transition flex items-center gap-1.5 shadow-neon-cyan">
+        <i class="fa-solid fa-download"></i>
+        <span>결과 이미지 다운로드 (PNG)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Mid-Draft Seed Reshuffle Modal -->
+<div id="order-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-cyan-500/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-arrows-up-down text-cyan-400"></i> 팀장 순번 재설정 (1~5번)
+      </h3>
+      <button id="close-order-modal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <p class="text-xs text-slate-400 mb-4">
+      팀장 순번을 다시 설정합니다. 순번을 변경하여 적용하면 현재 진행 중인 드래프트는 초기화됩니다.
+    </p>
+
+    <div id="modal-order-list" class="space-y-2 mb-5">
+      <!-- Generated via JS -->
+    </div>
+
+    <div class="flex items-center justify-between gap-2">
+      <button id="modal-randomize-btn" class="px-3 py-2 rounded-lg text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 text-amber-300">
+        <i class="fa-solid fa-dice mr-1 text-amber-400"></i> 무작위 셔플
+      </button>
+      <div class="flex items-center gap-2">
+        <button id="cancel-order-modal" class="px-3.5 py-2 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300">닫기</button>
+        <button id="apply-order-btn" class="px-4 py-2 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950">순번 확정 후 재시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-cyan-400/80 text-white shadow-2xl pointer-events-none">
+  <i id="toast-icon" class="fa-solid fa-circle-check text-cyan-400 text-lg"></i>
+  <span id="toast-message" class="text-xs font-medium">알림 메시지</span>
+</div>
+
+<script>
+// --- Audio Synthesizer (Web Audio API) ---
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
+  }
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+
+    if (type === 'pick') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.15);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (type === 'undo') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.15);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    } else if (type === 'error') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.setValueAtTime(140, now + 0.08);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } else if (type === 'complete') {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.08, now + i * 0.06);
+        g.gain.linearRampToValueAtTime(0.001, now + 0.6);
+        o.start(now + i * 0.06);
+        o.stop(now + 0.6);
+      });
+    }
+  } catch (e) {
+    console.error("Audio error", e);
+  }
+}
+
+// 1. Tank Captains (탱커 5인 고정: 둥그레, 룩삼, 울프, 콩콩, 푸린)
+const INITIAL_CAPTAINS = [
+  { id: 'c1', name: '둥그레', role: 'TANK', tag: 'DONGGEURAE' },
+  { id: 'c2', name: '룩삼', role: 'TANK', tag: 'LOOKSAM' },
+  { id: 'c3', name: '울프', role: 'TANK', tag: 'WOLF' },
+  { id: 'c4', name: '콩콩', role: 'TANK', tag: 'KONGKONG' },
+  { id: 'c5', name: '푸린', role: 'TANK', tag: 'POORIN' }
+];
+
+// 2. Draft Pool: DPS 10인 + SUP 10인 = 총 20인 (코치 완전 제거됨)
+const INITIAL_PLAYERS = [
+  // 딜러 (DPS 10인): 김뿡, 꼴랑이, 뀨냥냥, 디디디용, 마뫄, 뱅, 설백, 엘리, 정령왕, 큐베
+  { id: 'p1', name: '김뿡', role: 'DPS', style: '히트스캔 / 투사체' },
+  { id: 'p2', name: '꼴랑이', role: 'DPS', style: '플랭커 / 메인딜' },
+  { id: 'p3', name: '뀨냥냥', role: 'DPS', style: '올라운더 딜러' },
+  { id: 'p4', name: '디디디용', role: 'DPS', style: '히트스캔 전문' },
+  { id: 'p5', name: '마뫄', role: 'DPS', style: '투사체 장인' },
+  { id: 'p6', name: '뱅', role: 'DPS', style: '메인 딜러' },
+  { id: 'p7', name: '설백', role: 'DPS', style: '플렉스 딜러' },
+  { id: 'p8', name: '엘리', role: 'DPS', style: '히트스캔 / 저격' },
+  { id: 'p9', name: '정령왕', role: 'DPS', style: '피지컬 딜러' },
+  { id: 'p10', name: '큐베', role: 'DPS', style: '한타 메이커' },
+
+  // 힐러 (SUP 10인): 남봉, 눈꽃, 담유이, 삐부, 새담, 서넹, 아야츠노 유니, 양아지, 인섹, 임나은
+  { id: 'p11', name: '남봉', role: 'SUP', style: '메인 서포터 / 오더' },
+  { id: 'p12', name: '눈꽃', role: 'SUP', style: '플렉스 서포터' },
+  { id: 'p13', name: '담유이', role: 'SUP', style: '메인 서포터' },
+  { id: 'p14', name: '삐부', role: 'SUP', style: '서브 힐러' },
+  { id: 'p15', name: '새담', role: 'SUP', style: '생존 특화 힐러' },
+  { id: 'p16', name: '서넹', role: 'SUP', style: '안정적 케어' },
+  { id: 'p17', name: '아야츠노 유니', role: 'SUP', style: '서브 서포터' },
+  { id: 'p18', name: '양아지', role: 'SUP', style: '유틸 서포터' },
+  { id: 'p19', name: '인섹', role: 'SUP', style: '돌격형 서포터' },
+  { id: 'p20', name: '임나은', role: 'SUP', style: '케어형 힐러' }
+];
+
+// STATE MANAGEMENT
+let captainOrder = [0, 1, 2, 3, 4]; // indices in INITIAL_CAPTAINS
+let teams = [];
+let draftPicks = [];
+let activeRoleFilter = 'ALL';
+let searchQuery = '';
+let isDraftActive = false;
+
+// 4 Rounds Snake Sequence: R1(1-5), R2(5-1), R3(1-5), R4(5-1) = Exactly 20 Picks
+function generateSnakeSequence() {
+  const sequence = [];
+  const rounds = 4; // Exactly 4 rounds for 20 players (2 DPS + 2 SUP per team)
+  for (let r = 0; r < rounds; r++) {
+    const roundNumber = r + 1;
+    if (r % 2 === 0) {
+      // 1 -> 2 -> 3 -> 4 -> 5
+      for (let i = 0; i < 5; i++) {
+        sequence.push({ round: roundNumber, teamIndex: i });
+      }
+    } else {
+      // 5 -> 4 -> 3 -> 2 -> 1
+      for (let i = 4; i >= 0; i--) {
+        sequence.push({ round: roundNumber, teamIndex: i });
+      }
+    }
+  }
+  return sequence;
+}
+
+const snakeSequence = generateSnakeSequence();
+
+function startDraftWithOrder() {
+  teams = captainOrder.map((capIdx, orderIdx) => {
+    const captain = INITIAL_CAPTAINS[capIdx];
+    return {
+      id: `team-${orderIdx + 1}`,
+      seed: orderIdx + 1,
+      captain: captain,
+      roster: {
+        TANK: [captain],
+        DPS: [],
+        SUP: []
+      }
+    };
+  });
+  draftPicks = [];
+  isDraftActive = true;
+
+  document.getElementById('setup-view').classList.add('hidden');
+  document.getElementById('draft-workspace').classList.remove('hidden');
+  document.getElementById('draft-workspace').classList.add('flex');
+
+  renderAll();
+  playSound('pick');
+  showToast(`주장 순번 확정! 1번 시드 [${teams[0].captain.name} 팀]부터 드래프트가 시작됩니다.`, 'success');
+}
+
+function returnToSetupView() {
+  isDraftActive = false;
+  document.getElementById('draft-workspace').classList.add('hidden');
+  document.getElementById('draft-workspace').classList.remove('flex');
+  document.getElementById('setup-view').classList.remove('hidden');
+  renderSetupSlots();
+}
+
+function getCurrentPickIndex() {
+  return draftPicks.length;
+}
+
+function isDraftCompleted() {
+  return getCurrentPickIndex() >= snakeSequence.length;
+}
+
+function getCurrentTurnInfo() {
+  if (!isDraftActive || isDraftCompleted()) return null;
+  const currentPickIdx = getCurrentPickIndex();
+  const step = snakeSequence[currentPickIdx];
+  const team = teams[step.teamIndex];
+  return {
+    pickNumber: currentPickIdx + 1,
+    round: step.round,
+    teamIndex: step.teamIndex,
+    team: team
+  };
+}
+
+function canTeamPickRole(team, role) {
+  if (role === 'TANK') return false; // Captain is fixed
+  if (role === 'DPS' && team.roster.DPS.length >= 2) return false;
+  if (role === 'SUP' && team.roster.SUP.length >= 2) return false;
+  return true;
+}
+
+function getAvailablePlayers() {
+  const draftedIds = new Set(draftPicks.map(p => p.player.id));
+  return INITIAL_PLAYERS.filter(p => !draftedIds.has(p.id));
+}
+
+function pickPlayer(playerId) {
+  if (!isDraftActive || isDraftCompleted()) {
+    showToast('드래프트가 진행 중이 아닙니다.', 'error');
+    playSound('error');
+    return;
+  }
+
+  const turn = getCurrentTurnInfo();
+  if (!turn) return;
+
+  const player = INITIAL_PLAYERS.find(p => p.id === playerId);
+  if (!player) return;
+
+  const isPicked = draftPicks.some(p => p.player.id === player.id);
+  if (isPicked) {
+    showToast(`${player.name} 선수는 이미 지명되었습니다.`, 'error');
+    playSound('error');
+    return;
+  }
+
+  if (!canTeamPickRole(turn.team, player.role)) {
+    let msg = '';
+    if (player.role === 'DPS') msg = `${turn.team.captain.name} 팀은 이미 딜러 2인 지명을 마쳤습니다! 힐러를 선택해주세요.`;
+    if (player.role === 'SUP') msg = `${turn.team.captain.name} 팀은 이미 힐러 2인 지명을 마쳤습니다! 딜러를 선택해주세요.`;
+    showToast(msg, 'error');
+    playSound('error');
+    return;
+  }
+
+  // Commit Pick
+  turn.team.roster[player.role].push(player);
+  draftPicks.push({
+    pickNumber: turn.pickNumber,
+    round: turn.round,
+    teamId: turn.team.id,
+    teamName: `${turn.team.captain.name} 팀`,
+    player: player
+  });
+
+  playSound('pick');
+
+  if (isDraftCompleted()) {
+    playSound('complete');
+    showToast('🎉 모든 5개 팀의 로스터 구성(20픽)이 완료되었습니다!', 'success');
+    renderAll();
+    setTimeout(() => {
+      openCaptureModal();
+    }, 600);
+  } else {
+    showToast(`[${turn.team.captain.name} 팀] ${player.name} (${player.role}) 지명 완료!`, 'success');
+    renderAll();
+  }
+}
+
+function undoLastPick() {
+  if (draftPicks.length === 0) {
+    showToast('취소할 지명 기록이 없습니다.', 'error');
+    return;
+  }
+
+  const lastPick = draftPicks.pop();
+  const team = teams.find(t => t.id === lastPick.teamId);
+  if (team) {
+    const roleList = team.roster[lastPick.player.role];
+    const idx = roleList.findIndex(p => p.id === lastPick.player.id);
+    if (idx !== -1) roleList.splice(idx, 1);
+  }
+
+  playSound('undo');
+  showToast(`[${lastPick.player.name}] 지명이 취소되었습니다.`, 'info');
+  renderAll();
+}
+
+function autoPickCurrent() {
+  if (isDraftCompleted()) {
+    showToast('모든 드래프트가 이미 완료되었습니다.', 'error');
+    return;
+  }
+
+  const turn = getCurrentTurnInfo();
+  if (!turn) return;
+
+  const available = getAvailablePlayers();
+  const eligible = available.filter(p => canTeamPickRole(turn.team, p.role));
+
+  if (eligible.length === 0) {
+    showToast('선택 가능한 선수가 없습니다.', 'error');
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * eligible.length);
+  const pickedPlayer = eligible[randomIndex];
+  pickPlayer(pickedPlayer.id);
+}
+
+function renderSetupSlots() {
+  const container = document.getElementById('setup-slot-list');
+  let html = '';
+
+  captainOrder.forEach((capIdx, pos) => {
+    const cap = INITIAL_CAPTAINS[capIdx];
+    html += `
+      <div class="flex items-center justify-between bg-slate-950 p-3.5 sm:p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-950 to-blue-900 border border-cyan-400/60 text-cyan-300 font-chakra font-black text-sm flex items-center justify-center shadow-sm">
+            ${pos + 1}픽
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm sm:text-base font-bold text-white">${cap.name}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 border border-blue-600/40 text-blue-400 font-bold">주장/탱커</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono">${cap.tag}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select onchange="handleSetupSelectChange(${pos}, this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-cyan-400">
+            ${INITIAL_CAPTAINS.map((c, i) => `
+              <option value="${i}" ${i === capIdx ? 'selected' : ''}>${c.name}</option>
+            `).join('')}
+          </select>
+
+          <button onclick="moveSetupOrder(${pos}, -1)" ${pos === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center transition">
+            <i class="fa-solid fa-arrow-up text-xs"></i>
+          </button>
+          <button onclick="moveSetupOrder(${pos}, 1)" ${pos === 4 ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center transition">
+            <i class="fa-solid fa-arrow-down text-xs"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+window.moveSetupOrder = function(index, dir) {
+  const target = index + dir;
+  if (target < 0 || target >= captainOrder.length) return;
+  const temp = captainOrder[index];
+  captainOrder[index] = captainOrder[target];
+  captainOrder[target] = temp;
+  renderSetupSlots();
+};
+
+window.handleSetupSelectChange = function(position, newCapIdxStr) {
+  const newCapIdx = parseInt(newCapIdxStr, 10);
+  const oldPos = captainOrder.indexOf(newCapIdx);
+  if (oldPos !== -1) {
+    captainOrder[oldPos] = captainOrder[position];
+    captainOrder[position] = newCapIdx;
+  }
+  renderSetupSlots();
+};
+
+function renderAll() {
+  renderTurnHero();
+  renderTeams();
+  renderPlayerPool();
+  renderHistory();
+  updateButtonStates();
+}
+
+function renderTurnHero() {
+  const currentTurn = getCurrentTurnInfo();
+  const roundBadge = document.getElementById('draft-round-badge');
+  const stepBadge = document.getElementById('draft-step-badge');
+  const heroAvatar = document.getElementById('hero-team-avatar');
+  const heroName = document.getElementById('hero-team-name');
+  const heroNeeds = document.getElementById('hero-team-needs');
+  const snakeTrack = document.getElementById('snake-preview-track');
+
+  if (!currentTurn) {
+    roundBadge.innerText = 'DRAFT COMPLETE';
+    stepBadge.innerText = '20 / 20 PICKS';
+    heroAvatar.innerText = 'FIN';
+    heroAvatar.className = 'w-16 h-16 rounded-xl bg-emerald-600/30 border-2 border-emerald-400 flex items-center justify-center text-xl font-black text-emerald-300 font-chakra';
+    heroName.innerText = '드래프트 최종 완료!';
+    heroNeeds.innerHTML = '<span class="text-emerald-400 font-bold">5개 팀 로스터가 모두 완성되었습니다. [결과 캡쳐/공유] 버튼을 눌러 확인하세요.</span>';
+    snakeTrack.innerHTML = '<span class="text-slate-500 italic">추가 지명 없음</span>';
+    return;
+  }
+
+  roundBadge.innerText = `ROUND ${currentTurn.round} / 4`;
+  stepBadge.innerText = `PICK ${currentTurn.pickNumber} / 20`;
+
+  heroAvatar.innerText = `${currentTurn.team.seed}픽`;
+  heroAvatar.className = 'w-16 h-16 rounded-xl bg-blue-600/30 border-2 border-cyan-400 flex items-center justify-center text-2xl font-black text-cyan-300 font-chakra shadow-neon-cyan';
+  heroName.innerText = `${currentTurn.team.captain.name} 팀 (${currentTurn.team.captain.tag})`;
+
+  const dpsNeeded = 2 - currentTurn.team.roster.DPS.length;
+  const supNeeded = 2 - currentTurn.team.roster.SUP.length;
+
+  heroNeeds.innerHTML = `
+    <span class="text-slate-400">필요 슬롯:</span>
+    <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${dpsNeeded > 0 ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-slate-800 text-slate-500 line-through'}">딜러 ${dpsNeeded}명</span>
+    <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${supNeeded > 0 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-500 line-through'}">힐러 ${supNeeded}명</span>
+  `;
+
+  // Render upcoming preview sequence
+  const currentPickIdx = getCurrentPickIndex();
+  let previewHtml = '';
+  for (let i = currentPickIdx; i < Math.min(currentPickIdx + 6, snakeSequence.length); i++) {
+    const s = snakeSequence[i];
+    const t = teams[s.teamIndex];
+    const isCurrent = i === currentPickIdx;
+    previewHtml += `
+      <div class="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold ${isCurrent ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 font-bold' : 'bg-slate-900 border-slate-800 text-slate-400'}">
+        <span class="font-chakra text-[10px] opacity-70">#${i + 1}</span>
+        <span>${t.captain.name}</span>
+        ${isCurrent ? '<i class="fa-solid fa-play text-[9px] text-cyan-400 animate-pulse"></i>' : ''}
+      </div>
+    `;
+  }
+  snakeTrack.innerHTML = previewHtml;
+}
+
+function renderTeams() {
+  const container = document.getElementById('teams-container');
+  const currentTurn = getCurrentTurnInfo();
+
+  let html = '';
+  teams.forEach((team) => {
+    const isCurrent = currentTurn && currentTurn.team.id === team.id;
+    const isFull = (team.roster.DPS.length === 2 && team.roster.SUP.length === 2);
+
+    html += `
+      <div class="bg-slate-900/90 border transition-all duration-200 rounded-xl p-3 sm:p-4 ${isCurrent ? 'border-cyan-400 shadow-neon-cyan ring-1 ring-cyan-400/50 turn-active bg-slate-900' : 'border-slate-800 hover:border-slate-700'}">
+        
+        <!-- Team Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center font-chakra font-black text-xs ${isCurrent ? 'text-cyan-300 bg-cyan-950 border-cyan-500' : 'text-slate-300'}">
+              ${team.seed}
+            </span>
+            <span class="font-bold text-white text-sm sm:text-base">${team.captain.name} 팀</span>
+            ${isCurrent ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-cyan-400 text-slate-950 animate-bounce">지명 차례!</span>' : ''}
+            ${isFull ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">완성</span>' : ''}
+          </div>
+          
+          <div class="text-[11px] text-slate-400 font-chakra">
+            인원: <span class="font-bold text-white">${1 + team.roster.DPS.length + team.roster.SUP.length}</span>/5
+          </div>
+        </div>
+
+        <!-- Team Roster Slots (5 total: Tank, DPS 1, DPS 2, SUP 1, SUP 2) -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+          
+          <!-- TANK Slot -->
+          <div class="bg-blue-950/40 border border-blue-600/40 rounded-lg p-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[10px] text-blue-400 font-bold mb-1">
+              <span>TANK (팀장)</span>
+              <i class="fa-solid fa-shield"></i>
+            </div>
+            <div class="font-bold text-white text-sm truncate">${team.captain.name}</div>
+            <div class="text-[10px] text-blue-300 font-mono truncate">${team.captain.tag}</div>
+          </div>
+
+          <!-- DPS 1 Slot -->
+          ${renderPlayerSlot(team.roster.DPS[0], 'DPS 1', 'fa-crosshairs', 'red')}
+
+          <!-- DPS 2 Slot -->
+          ${renderPlayerSlot(team.roster.DPS[1], 'DPS 2', 'fa-crosshairs', 'red')}
+
+          <!-- SUP 1 Slot -->
+          ${renderPlayerSlot(team.roster.SUP[0], 'SUP 1', 'fa-heart-pulse', 'emerald')}
+
+          <!-- SUP 2 Slot -->
+          ${renderPlayerSlot(team.roster.SUP[1], 'SUP 2', 'fa-heart-pulse', 'emerald')}
+
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderPlayerSlot(player, slotLabel, iconClass, colorTheme) {
+  const bgMap = {
+    red: 'bg-red-950/20 border-red-900/40 text-red-400',
+    emerald: 'bg-emerald-950/20 border-emerald-900/40 text-emerald-400',
+  };
+
+  if (!player) {
+    return `
+      <div class="border border-dashed border-slate-800 bg-slate-950/40 rounded-lg p-2 flex flex-col justify-center items-center text-center opacity-60">
+        <span class="text-[10px] text-slate-500 font-semibold mb-1">${slotLabel}</span>
+        <span class="text-xs text-slate-600">미지명</span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="${bgMap[colorTheme]} border rounded-lg p-2 flex flex-col justify-between">
+      <div class="flex items-center justify-between text-[10px] font-bold mb-1">
+        <span>${slotLabel}</span>
+        <i class="fa-solid ${iconClass}"></i>
+      </div>
+      <div class="font-bold text-white text-sm truncate">${player.name}</div>
+      <div class="text-[10px] text-slate-400 truncate">${player.style || ''}</div>
+    </div>
+  `;
+}
+
+function renderPlayerPool() {
+  const grid = document.getElementById('player-grid');
+  const currentTurn = getCurrentTurnInfo();
+  const draftedIds = new Set(draftPicks.map(p => p.player.id));
+  
+  let filtered = INITIAL_PLAYERS.filter(p => {
+    if (draftedIds.has(p.id)) return false;
+    if (activeRoleFilter !== 'ALL' && p.role !== activeRoleFilter) return false;
+    if (searchQuery.trim() && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+
+  const allAvailable = INITIAL_PLAYERS.filter(p => !draftedIds.has(p.id));
+  document.getElementById('count-all').innerText = allAvailable.length;
+  document.getElementById('count-dps').innerText = allAvailable.filter(p => p.role === 'DPS').length;
+  document.getElementById('count-sup').innerText = allAvailable.filter(p => p.role === 'SUP').length;
+  document.getElementById('remaining-pool-count').innerText = `${allAvailable.length} / 20명`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-12 text-center text-slate-500">
+        <i class="fa-solid fa-filter text-2xl mb-2 block"></i>
+        조건에 맞는 남은 선수가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(player => {
+    let isEligible = true;
+    let reason = '';
+    if (currentTurn) {
+      if (!canTeamPickRole(currentTurn.team, player.role)) {
+        isEligible = false;
+        reason = `${player.role} 정원 완료`;
+      }
+    } else {
+      isEligible = false;
+      reason = '드래프트 완료';
+    }
+
+    const roleBadgeClass = {
+      DPS: 'bg-red-950 text-red-400 border-red-700',
+      SUP: 'bg-emerald-950 text-emerald-400 border-emerald-700',
+    }[player.role];
+
+    const roleIcon = {
+      DPS: 'fa-crosshairs',
+      SUP: 'fa-heart-pulse',
+    }[player.role];
+
+    html += `
+      <div onclick="${isEligible ? `pickPlayer('${player.id}')` : ''}" 
+           class="group relative bg-slate-950/70 border rounded-xl p-3 flex flex-col justify-between transition-all duration-150 ${
+             isEligible 
+               ? 'border-slate-800 hover:border-cyan-400 hover:bg-slate-900 cursor-pointer hover:shadow-lg hover:-translate-y-0.5' 
+               : 'border-slate-850 opacity-40 cursor-not-allowed bg-slate-950/40'
+           }">
+        
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${roleBadgeClass} flex items-center gap-1">
+            <i class="fa-solid ${roleIcon}"></i> ${player.role}
+          </span>
+          ${isEligible 
+            ? `<span class="text-[10px] text-cyan-400 font-bold opacity-0 group-hover:opacity-100 transition">지명 <i class="fa-solid fa-arrow-right"></i></span>` 
+            : `<span class="text-[9px] text-rose-400 font-medium">${reason}</span>`
+          }
+        </div>
+
+        <div class="my-1">
+          <h4 class="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">${player.name}</h4>
+          <p class="text-[11px] text-slate-400 truncate mt-0.5">${player.style}</p>
+        </div>
+
+        <div class="mt-2 pt-2 border-t border-slate-900 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500 text-[10px]">클릭 시 즉시 영입</span>
+          <i class="fa-solid fa-user-plus text-slate-600 group-hover:text-cyan-400 transition"></i>
+        </div>
+
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+function renderHistory() {
+  const container = document.getElementById('draft-history-list');
+  const counter = document.getElementById('history-count');
+  counter.innerText = `${draftPicks.length} / 20 PICKS`;
+
+  if (draftPicks.length === 0) {
+    container.innerHTML = '<div class="text-slate-500 italic py-2 text-center text-[11px]">아직 지명 기록이 없습니다.</div>';
+    return;
+  }
+
+  const reversed = [...draftPicks].reverse();
+  let html = '';
+  reversed.forEach(p => {
+    const roleColor = {
+      DPS: 'text-red-400',
+      SUP: 'text-emerald-400',
+    }[p.player.role] || 'text-cyan-400';
+
+    html += `
+      <div class="flex items-center justify-between bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-chakra font-bold text-cyan-400">#${p.pickNumber}</span>
+          <span class="text-[11px] font-semibold text-slate-300">${p.teamName}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-white font-bold text-xs">${p.player.name}</span>
+          <span class="text-[10px] font-bold ${roleColor}">[${p.player.role}]</span>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function updateButtonStates() {
+  const undoBtn = document.getElementById('undo-btn');
+  undoBtn.disabled = draftPicks.length === 0;
+
+  const autoBtn = document.getElementById('auto-pick-btn');
+  if (isDraftCompleted()) {
+    autoBtn.disabled = true;
+    autoBtn.classList.add('opacity-50', 'pointer-events-none');
+  } else {
+    autoBtn.disabled = false;
+    autoBtn.classList.remove('opacity-50', 'pointer-events-none');
+  }
+}
+
+function openCaptureModal() {
+  const modal = document.getElementById('capture-modal');
+  const dateEl = document.getElementById('capture-card-date');
+  const grid = document.getElementById('capture-teams-grid');
+
+  const now = new Date();
+  dateEl.innerText = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  let html = '';
+  teams.forEach(t => {
+    html += `
+      <div class="bg-[#0e1628] border border-cyan-500/30 rounded-xl p-3 flex flex-col justify-between">
+        <div class="border-b border-slate-800 pb-2 mb-2 flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="w-5 h-5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-400 font-chakra font-bold text-xs flex items-center justify-center">
+              ${t.seed}
+            </span>
+            <span class="font-bold text-white text-sm">${t.captain.name} 팀</span>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <!-- Tank -->
+          <div class="bg-blue-950/60 border border-blue-600/40 rounded px-2 py-1.5 flex items-center justify-between">
+            <span class="text-[10px] text-blue-400 font-bold">탱커</span>
+            <span class="font-bold text-white text-[11px]">${t.captain.name}</span>
+          </div>
+
+          <!-- DPS 1 -->
+          <div class="bg-red-950/40 border border-red-800/40 rounded px-2 py-1 flex items-center justify-between">
+            <span class="text-[10px] text-red-400 font-bold">DPS 1</span>
+            <span class="font-semibold text-slate-200 text-[11px]">${t.roster.DPS[0]?.name || '<span class="text-slate-600">미지명</span>'}</span>
+          </div>
+
+          <!-- DPS 2 -->
+          <div class="bg-red-950/40 border border-red-800/40 rounded px-2 py-1 flex items-center justify-between">
+            <span class="text-[10px] text-red-400 font-bold">DPS 2</span>
+            <span class="font-semibold text-slate-200 text-[11px]">${t.roster.DPS[1]?.name || '<span class="text-slate-600">미지명</span>'}</span>
+          </div>
+
+          <!-- SUP 1 -->
+          <div class="bg-emerald-950/40 border border-emerald-800/40 rounded px-2 py-1 flex items-center justify-between">
+            <span class="text-[10px] text-emerald-400 font-bold">SUP 1</span>
+            <span class="font-semibold text-slate-200 text-[11px]">${t.roster.SUP[0]?.name || '<span class="text-slate-600">미지명</span>'}</span>
+          </div>
+
+          <!-- SUP 2 -->
+          <div class="bg-emerald-950/40 border border-emerald-800/40 rounded px-2 py-1 flex items-center justify-between">
+            <span class="text-[10px] text-emerald-400 font-bold">SUP 2</span>
+            <span class="font-semibold text-slate-200 text-[11px]">${t.roster.SUP[1]?.name || '<span class="text-slate-600">미지명</span>'}</span>
+          </div>
+        </div>
+
+        <div class="mt-2 pt-1.5 border-t border-slate-800 text-[10px] text-center text-cyan-400/80 font-mono">
+          ${t.captain.tag}
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+  modal.classList.remove('hidden');
+}
+
+// Download Screenshot as PNG using html2canvas
+async function downloadResultImage() {
+  const card = document.getElementById('capture-target-card');
+  const btn = document.getElementById('btn-download-image');
+  
+  try {
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>이미지 생성 중...</span>';
+    btn.disabled = true;
+
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#080d1a',
+      logging: false,
+    });
+
+    const link = document.createElement('a');
+    link.download = `runner_league_s5_draft_result_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    showToast('결과 이미지가 성공적으로 다운로드되었습니다!', 'success');
+  } catch (err) {
+    console.error('html2canvas capture error:', err);
+    showToast('이미지 저장 중 오류가 발생했습니다.', 'error');
+  } finally {
+    btn.innerHTML = '<i class="fa-solid fa-download"></i> <span>결과 이미지 다운로드 (PNG)</span>';
+    btn.disabled = false;
+  }
+}
+
+// Copy Image Directly to Clipboard (for Discord, Chzzk, Naver Cafe)
+async function copyResultImageToClipboard() {
+  const card = document.getElementById('capture-target-card');
+  const btn = document.getElementById('btn-copy-image');
+  const textSpan = document.getElementById('btn-copy-image-text');
+
+  if (!navigator.clipboard || !window.ClipboardItem) {
+    showToast('현재 브라우저 환경에서는 이미지 복사가 제한됩니다. 다운로드를 이용해주세요.', 'error');
+    return;
+  }
+
+  try {
+    textSpan.innerText = '이미지 생성 및 복사 중...';
+    btn.disabled = true;
+
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#080d1a',
+      logging: false,
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        showToast('이미지 변환에 실패했습니다.', 'error');
+        return;
+      }
+      try {
+        const item = new ClipboardItem({ 'image/png': blob });
+        await navigator.clipboard.write([item]);
+        showToast('결과 이미지가 클립보드에 복사되었습니다! (Ctrl+V로 붙여넣기)', 'success');
+      } catch (clipErr) {
+        console.warn('Clipboard write failure', clipErr);
+        // Fallback info
+        showToast('클립보드 권한 문제로 복사 실패. [이미지 다운로드]를 이용해주세요.', 'error');
+      } finally {
+        textSpan.innerText = '이미지 클립보드 복사';
+        btn.disabled = false;
+      }
+    }, 'image/png');
+
+  } catch (err) {
+    console.error('Clipboard capture error:', err);
+    showToast('이미지 복사 처리 중 오류가 발생했습니다.', 'error');
+    textSpan.innerText = '이미지 클립보드 복사';
+    btn.disabled = false;
+  }
+}
+
+function copyTextSummary() {
+  let summaryText = `🏆 [2026 오버워치 러너리그 시즌 5 모의 스네이크 드래프트 결과]\n`;
+  summaryText += `진행 상태: ${draftPicks.length}/20 지명 완료\n`;
+  summaryText += `--------------------------------------------------\n`;
+
+  teams.forEach(t => {
+    const dpsList = t.roster.DPS.map(p => p.name).join(', ') || '미지명';
+    const supList = t.roster.SUP.map(p => p.name).join(', ') || '미지명';
+    summaryText += `■ [${t.seed}번 시드] ${t.captain.name} 팀\n`;
+    summaryText += ` - 탱커(팀장): ${t.captain.name}\n`;
+    summaryText += ` - 딜러: ${dpsList}\n`;
+    summaryText += ` - 힐러: ${supList}\n\n`;
+  });
+
+  summaryText += `--------------------------------------------------\n`;
+  summaryText += `* 코치는 럭키 드로우 배정\n`;
+  summaryText += `생성일: ${new Date().toLocaleDateString('ko-KR')} | 오버워치 러너리그 드래프트`;
+
+  const tempTextArea = document.createElement('textarea');
+  tempTextArea.value = summaryText;
+  document.body.appendChild(tempTextArea);
+  tempTextArea.select();
+  try {
+    document.execCommand('copy');
+    showToast('드래프트 텍스트 요약이 클립보드에 복사되었습니다!', 'success');
+  } catch (err) {
+    showToast('텍스트 복사 실패', 'error');
+  }
+  document.body.removeChild(tempTextArea);
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  const msgEl = document.getElementById('toast-message');
+  const icon = document.getElementById('toast-icon');
+
+  msgEl.innerText = message;
+
+  if (type === 'success') {
+    icon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+    toast.className = 'fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-emerald-400 text-white shadow-2xl';
+  } else if (type === 'error') {
+    icon.className = 'fa-solid fa-circle-exclamation text-rose-400 text-lg';
+    toast.className = 'fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-rose-500 text-white shadow-2xl';
+  } else {
+    icon.className = 'fa-solid fa-circle-info text-cyan-400 text-lg';
+    toast.className = 'fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-cyan-400 text-white shadow-2xl';
+  }
+
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => {
+    toast.className = 'fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border text-white shadow-2xl pointer-events-none';
+  }, 3200);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderSetupSlots();
+
+  // Setup Screen Buttons
+  document.getElementById('setup-random-btn').addEventListener('click', () => {
+    for (let i = captainOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [captainOrder[i], captainOrder[j]] = [captainOrder[j], captainOrder[i]];
+    }
+    renderSetupSlots();
+    playSound('pick');
+    showToast('팀장 5인의 순번이 랜덤 셔플되었습니다.', 'info');
+  });
+
+  document.getElementById('setup-start-draft-btn').addEventListener('click', () => {
+    startDraftWithOrder();
+  });
+
+  // Role filter tab click
+  document.querySelectorAll('.role-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.role-tab').forEach(t => {
+        t.classList.remove('bg-cyan-500', 'text-slate-950', 'active');
+        t.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      tab.classList.add('bg-cyan-500', 'text-slate-950', 'active');
+      tab.classList.remove('bg-slate-800', 'text-slate-300');
+      activeRoleFilter = tab.dataset.role;
+      renderPlayerPool();
+    });
+  });
+
+  // Search input
+  const searchInput = document.getElementById('player-search');
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderPlayerPool();
+  });
+
+  // Undo button
+  document.getElementById('undo-btn').addEventListener('click', () => {
+    undoLastPick();
+  });
+
+  // Auto / AI Pick
+  document.getElementById('auto-pick-btn').addEventListener('click', () => {
+    autoPickCurrent();
+  });
+
+  // Reset Draft
+  document.getElementById('reset-draft-btn').addEventListener('click', () => {
+    returnToSetupView();
+  });
+
+  // Sound FX toggle
+  const sfxBtn = document.getElementById('sfx-toggle-btn');
+  const sfxIcon = document.getElementById('sfx-icon');
+  sfxBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    if (soundEnabled) {
+      sfxIcon.className = 'fa-solid fa-volume-high text-cyan-400';
+      sfxBtn.querySelector('span').innerText = '효과음 ON';
+      showToast('효과음이 켜졌습니다.', 'info');
+      playSound('pick');
+    } else {
+      sfxIcon.className = 'fa-solid fa-volume-xmark text-slate-500';
+      sfxBtn.querySelector('span').innerText = '효과음 OFF';
+      showToast('효과음이 꺼졌습니다.', 'info');
+    }
+  });
+
+  // Capture Modal Trigger
+  document.getElementById('result-view-btn').addEventListener('click', () => {
+    openCaptureModal();
+  });
+
+  document.getElementById('close-capture-modal').addEventListener('click', () => {
+    document.getElementById('capture-modal').classList.add('hidden');
+  });
+
+  document.getElementById('btn-download-image').addEventListener('click', downloadResultImage);
+  document.getElementById('btn-copy-image').addEventListener('click', copyResultImageToClipboard);
+  document.getElementById('btn-copy-text-summary').addEventListener('click', copyTextSummary);
+
+  // Mid-Draft Order Re-setup modal
+  const orderModal = document.getElementById('order-modal');
+  const orderModalBtn = document.getElementById('order-modal-btn');
+  const closeOrderModal = document.getElementById('close-order-modal');
+  const cancelOrderModal = document.getElementById('cancel-order-modal');
+  const applyOrderBtn = document.getElementById('apply-order-btn');
+  const modalRandomizeBtn = document.getElementById('modal-randomize-btn');
+
+  function renderModalOrderList() {
+    const list = document.getElementById('modal-order-list');
+    let html = '';
+    captainOrder.forEach((capIdx, pos) => {
+      const cap = INITIAL_CAPTAINS[capIdx];
+      html += `
+        <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded bg-cyan-950 border border-cyan-500/50 text-cyan-400 font-chakra font-bold text-xs flex items-center justify-center">
+              ${pos + 1}
+            </span>
+            <span class="text-xs font-bold text-white">${cap.name} (${cap.tag})</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="moveOrder(${pos}, -1)" ${pos === 0 ? 'disabled' : ''} class="w-7 h-7 rounded bg-slate-800 text-slate-300 hover:text-white disabled:opacity-30">
+              <i class="fa-solid fa-chevron-up text-xs"></i>
+            </button>
+            <button onclick="moveOrder(${pos}, 1)" ${pos === 4 ? 'disabled' : ''} class="w-7 h-7 rounded bg-slate-800 text-slate-300 hover:text-white disabled:opacity-30">
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    list.innerHTML = html;
+  }
+
+  window.moveOrder = function(index, dir) {
+    const target = index + dir;
+    if (target < 0 || target >= captainOrder.length) return;
+    const temp = captainOrder[index];
+    captainOrder[index] = captainOrder[target];
+    captainOrder[target] = temp;
+    renderModalOrderList();
+  };
+
+  orderModalBtn.addEventListener('click', () => {
+    renderModalOrderList();
+    orderModal.classList.remove('hidden');
+  });
+
+  closeOrderModal.addEventListener('click', () => orderModal.classList.add('hidden'));
+  cancelOrderModal.addEventListener('click', () => orderModal.classList.add('hidden'));
+
+  modalRandomizeBtn.addEventListener('click', () => {
+    for (let i = captainOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [captainOrder[i], captainOrder[j]] = [captainOrder[j], captainOrder[i]];
+    }
+    renderModalOrderList();
+    showToast('팀장 순번이 랜덤 셔플되었습니다.', 'info');
+  });
+
+  applyOrderBtn.addEventListener('click', () => {
+    orderModal.classList.add('hidden');
+    startDraftWithOrder();
+  });
+});
+</script>
+</body>
+</html>
